@@ -1,3 +1,61 @@
-dataset link  :     https://www.kaggle.com/datasets/mohitpoudel/us-honey-production-19952021
-Supervised learning
-Linear Regression : http://localhost:8889/notebooks/US_Honey_Dataset.ipynb
+Dataset link  :     https://www.kaggle.com/datasets/mohitpoudel/us-honey-production-19952021
+
+
+---- Jupyter Notebook Supervised learning Code including Linear Regression and Logistic Regression -----
+
+import pandas as pd 
+import numpy as np 
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from matplotlib.colors import ListedColormap
+
+
+data=pd.read_csv("US_honey_dataset_updated.csv")
+
+# Create a Linear Regression model and fit it to training data
+model = LinearRegression()
+model.fit(data[['colonies_number','yield_per_colony']],data.production)
+
+model.coef_
+
+model.intercept_
+
+y_new =model.coef_[0]*1500 + model.coef_[1]*48 + model.intercept_
+
+y_new
+
+plt.scatter(data.production,data.colonies_number)
+plt.xlabel('Production')
+plt.ylabel('Colonies Number')
+
+sns.regplot(x=data['production'], y=data['colonies_number'])
+
+#install "pip install scikit-learn"
+
+#Logistic Regression
+# Want to predict whether "yield_per_colony" is above or below a certain threshold
+X = data[['colonies_number', 'stocks', 'average_price']]
+y = data['yield_per_colony'] > 60
+
+#Split your data into a training set and a testing set to evaluate the model
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+#Create a Logistic regression model and fit it to training data
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+accuracy = model.score(X_test, y_test)
+print(f"Accuracy: {accuracy * 100:.2f}%")
+
+# creates a list of accuracies with the same length as your dataset. This will create a horizontal line on the plot at the accuracy value.
+plt.scatter(data.yield_per_colony,[accuracy] * len(data))
+plt.xlabel('Yield per Colony')
+plt.ylabel('Accuracy')
